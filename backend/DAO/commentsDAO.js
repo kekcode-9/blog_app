@@ -9,6 +9,7 @@ export default class CommentsDAO {
             const newComment = new Comment({
                 commenter: req.params.userId,
                 article: req.params.articleId,
+                originalPoster: req.body.opId,
                 text: req.body.text
             });
             const comment = await newComment.save();

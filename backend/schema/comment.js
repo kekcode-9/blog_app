@@ -11,6 +11,11 @@ const comment = new mongoose.Schema({
         ref: "articles",
         required: true
     },
+    originalPoster: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "users",
+        required: true
+    },
     text: {
         type: String,
         required: true

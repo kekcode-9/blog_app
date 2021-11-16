@@ -16,6 +16,6 @@ userRouter.put('/:id/update', UserDAO.updateUser); //id in param is id of logged
 userRouter.delete('/:id/delete', UserDAO.deleteUser);
 
 // view route
-userRouter.get('/:userName/view', UserDAO.viewUser);
+userRouter.get('/:userId/view/:bloggerName', UserDAO.viewUser);
 
 export default userRouter;
