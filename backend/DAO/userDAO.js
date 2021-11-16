@@ -1,6 +1,7 @@
 import User from '../schema/user.js';
 import Article from '../schema/article.js';
 import Follows from '../schema/follows.js';
+import Comment from '../schema/comment.js';
 import bcrypt from 'bcrypt';
 
 export default class UserDAO {
@@ -73,6 +74,7 @@ export default class UserDAO {
                 try{
                     const user = User.findById(req.params.id);
                     console.log(req.params.id);
+                    await Comment.deleteMany({ originalPoster: req.params.id });
                     await Article.deleteMany({ author: req.params.id });
                     await Follows.deleteMany({ follows: req.params.id });
                     await User.findByIdAndDelete(req.params.id);
@@ -92,10 +94,22 @@ export default class UserDAO {
     static async viewUser(req, res, next) {
         try{
             const user = await User.findOne({
-                userName: req.params.userName
+                userName: req.params.bloggerName
+            });
+            const userFollowsBlogger = await Follows.findOne({
+                follower: req.params.userId,
+                follows: req.body.bloggerId
+            });
+            const articles = await Article.find({
+                author: req.body.bloggerId
             });
             const {password, ...others} = user._doc;
-            res.status(200).json(others);
+            if(userFollowsBlogger) {
+                others["isFollower"] = true;
+            } else {
+                others["isFollower"] = false;
+            }
+            res.status(200).send({others: others, articles: articles});
         } catch(err) {
             res.status(400).json('User does not exist');
         }

@@ -2,8 +2,6 @@ import Article from "../schema/article.js";
 import Comment from "../schema/comment.js";
 import mongoose from 'mongoose';
 
-// delete your article
-
 export default class ArticlesDAO {
     // create new article
     static async createArticle(req, res, next) {
@@ -74,6 +72,48 @@ export default class ArticlesDAO {
             res.status(200).json(article);
         } catch(err) {
             res.status(404).json('error fetching article: ' + err);
+        }
+    }
+
+    // get all articles
+    static async getAll (req, res, next) {
+        try {
+            const allArticles = Article.find();
+            res.status(200).json(allArticles);
+        } catch (err) {
+            res.status(500).json(err);
+        }
+    }
+
+    // get articles by filter
+    static async getByFilter (req, res, next) {
+        try {
+                var matchStage = {
+                $match: {}
+            };
+            var sortStage = {
+                $sort: {}
+            };
+            if (req.body.tags) {
+                matchStage.$match["tags"] = {$in: req.body.tags};
+            }
+            if (req.body.sortByUpvotes) {
+                sortStage.$sort["upvotes"] = req.body.sortByUpvotes;
+            }
+            if (req.body.sortByCreatetionTime) {
+                sortStage.$sort["createdAt"] = req.body.sortByCreatetionTime;
+            }
+            var aggrPipeline = [];
+            if (Object.keys(matchStage.$match) != "") {
+                aggrPipeline.push(matchStage);
+            }
+            if (Object.keys(sortStage.$sort) != "") {
+                aggrPipeline.push(sortStage);
+            }
+            const articles = await Article.aggregate(aggrPipeline);
+            res.status(200).json(articles);
+        } catch (err) {
+            res.status(404).json('error fetching articles: ' + err);
         }
     }
 
