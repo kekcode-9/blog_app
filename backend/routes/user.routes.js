@@ -15,6 +15,9 @@ userRouter.put('/:id/update', UserDAO.updateUser); //id in param is id of logged
 // delete route
 userRouter.delete('/:id/delete', UserDAO.deleteUser);
 
+// logout user
+userRouter.delete('/logout', UserDAO.logoutUser);
+
 // view route
 userRouter.get('/:userId/view/:bloggerName', UserDAO.viewUser);
 

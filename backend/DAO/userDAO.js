@@ -14,6 +14,7 @@ export default class UserDAO {
             const newUser = new User({
                 name: req.body.name,
                 userName: req.body.userName,
+                email: req.body.email,
                 password: hashedPassword
             });
             const user = await newUser.save();
@@ -31,12 +32,33 @@ export default class UserDAO {
 
             const valid = await bcrypt.compare(req.body.password, user.password);
             !valid && res.status(400).json('Invalid Password');
+            
+            // create session user
+            const sessUser = {
+                id: user._id,
+                userName: user.userName,
+                email: user.email
+            };
+            console.log('req.session: ' + req.session);
 
-            const {password, ...others} = user._doc; // store password and other fields of the user document
-            res.status(200).json(others);
+            req.session.user = sessUser; // will autosave the session on mongostore
+            
+            res.status(200).json(sessUser);
+
         } catch(err) {
             res.status(500).json(`login error: ${err}`);
         }
+    }
+
+    // logging out user and deleting session
+    static async logoutUser(req, res, next) {
+        req.session.destroy((err) => {
+            if (err) throw err;
+
+            // remove cookie with session id
+            res.clearCookie('connect.sid');
+            res.send('Logged out successfully');
+        })
     }
 
     // updating a user
