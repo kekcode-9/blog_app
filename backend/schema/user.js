@@ -10,6 +10,10 @@ const user = new mongoose.Schema({
         default: '',
         unique: true
     },
+    email : {
+        type: String,
+        default: ''
+    },
     bio: {
         type: String,
         default: ''
