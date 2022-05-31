@@ -32,7 +32,6 @@ app.use(
       secure: false,
       path: '/',
       httpOnly: false,
-      maxAge: MAX_AGE,
       sameSite: false
     }
   })
